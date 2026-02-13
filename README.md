@@ -7,6 +7,9 @@ A Python MCP (Model Context Protocol) server that integrates Todoist with [Nanob
 - **create_task** – Create Todoist tasks with content, due dates, priority, and project
 - **create_reminder_task** – Quick reminder creation (convenience wrapper)
 - **list_projects** – List your Todoist projects (useful for choosing where to add tasks)
+- **list_tasks_today** – List tasks due today
+- **list_tasks_overdue** – List late/overdue tasks
+- **list_tasks_this_week** – List tasks due this week
 
 ## Setup
 
@@ -96,18 +99,27 @@ agents:
       You can create Todoist tasks when the user asks to be reminded of something.
       Use the create_task or create_reminder_task tool when they say things like
       "remind me to..." or "add to my todo list...".
+      You can also answer questions about their tasks using list_tasks_today,
+      list_tasks_overdue, and list_tasks_this_week when they ask "what do I have
+      today?", "what's overdue?", or "what's due this week?".
 ```
 
 ## Usage with Nanobot
 
 Once configured, you can say things like:
 
+**Creating tasks:**
 - "Remind me to call the dentist tomorrow"
 - "Add 'buy groceries' to my todo list"
 - "Create a task to review the report by Friday"
 - "Put 'water the plants' in my Inbox for today"
 
-Nanobot will use the Todoist tools to create the tasks.
+**Asking about your tasks:**
+- "What do I have due today?"
+- "What tasks are overdue?"
+- "What's on my plate this week?"
+
+Nanobot will use the Todoist tools to create tasks or answer questions about your task list.
 
 ## Testing locally
 

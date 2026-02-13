@@ -53,7 +53,7 @@ def create_task(
         The created task details including id, url, and content.
     """
     api = _get_api()
-    kwargs = {"content": content}
+    kwargs = {"content": content, "labels": ["nanobot"]}
     if project_id:
         kwargs["project_id"] = project_id
     if due_string:
@@ -71,6 +71,7 @@ def create_task(
             "content": task.content,
             "url": task.url,
             "due": str(task.due) if task.due else None,
+            "priority": getattr(task, "priority", None),
             "message": f"Created task: {task.content}",
         }
     except Exception as e:
@@ -94,7 +95,8 @@ def list_projects() -> dict:
     """
     api = _get_api()
     try:
-        projects = api.get_projects()
+        # get_projects() returns Iterator[list[Project]] in todoist-api-python 3.x
+        all_projects = [p for batch in api.get_projects() for p in batch]
         return {
             "success": True,
             "projects": [
@@ -103,7 +105,7 @@ def list_projects() -> dict:
                     "name": p.name,
                     "is_inbox": getattr(p, "is_inbox_project", False),
                 }
-                for p in projects
+                for p in all_projects
             ],
         }
     except Exception as e:
@@ -131,3 +133,73 @@ def create_reminder_task(content: str, when: str = "today") -> dict:
         The created task details.
     """
     return create_task(content=content, due_string=when)
+
+
+def _list_tasks_with_filter(filter_query: str) -> dict:
+    """Fetch tasks matching a Todoist filter query. Returns standardized task list."""
+    api = _get_api()
+    try:
+        # filter_tasks() returns Iterator[list[Task]] in todoist-api-python 3.x
+        all_tasks = [t for batch in api.filter_tasks(query=filter_query) for t in batch]
+        return {
+            "success": True,
+            "tasks": [
+                {
+                    "id": t.id,
+                    "content": t.content,
+                    "url": t.url,
+                    "due": str(t.due) if t.due else None,
+                    "priority": getattr(t, "priority", None),
+                    "project_id": getattr(t, "project_id", None),
+                }
+                for t in all_tasks
+            ],
+            "count": len(all_tasks),
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "message": f"Failed to list tasks: {e}",
+        }
+
+
+@mcp.tool()
+def list_tasks_today() -> dict:
+    """
+    List tasks due today.
+
+    Use when the user asks what they need to do today, what's on their plate today,
+    or what tasks are due today.
+
+    Returns:
+        List of tasks with id, content, url, due date, and priority.
+    """
+    return _list_tasks_with_filter("today")
+
+
+@mcp.tool()
+def list_tasks_overdue() -> dict:
+    """
+    List overdue tasks (past their due date).
+
+    Use when the user asks about late tasks, overdue items, or what they've missed.
+
+    Returns:
+        List of tasks with id, content, url, due date, and priority.
+    """
+    return _list_tasks_with_filter("overdue")
+
+
+@mcp.tool()
+def list_tasks_this_week() -> dict:
+    """
+    List tasks due this week (including today and overdue).
+
+    Use when the user asks what they need to do this week, their weekly tasks,
+    or what's coming up this week.
+
+    Returns:
+        List of tasks with id, content, url, due date, and priority.
+    """
+    return _list_tasks_with_filter("due before: next week")

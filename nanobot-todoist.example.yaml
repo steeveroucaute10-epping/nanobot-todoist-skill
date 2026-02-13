@@ -15,6 +15,10 @@ agents:
       Use create_task for full control (project, due date, priority).
       Use create_reminder_task for quick reminders.
       Use list_projects if the user wants to see their projects or add to a specific one.
+      
+      You can also answer questions about their tasks: use list_tasks_today,
+      list_tasks_overdue, or list_tasks_this_week when they ask "what do I have
+      today?", "what's overdue?", or "what's due this week?".
 
 mcpServers:
   # Option 1: Command/stdio (recommended for local/Raspberry Pi)

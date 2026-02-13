@@ -5,9 +5,21 @@ Run the Todoist MCP server.
 Usage:
   python run.py           # Stdio transport (for nanobot command config)
   python run.py --http    # HTTP transport on port 8000
+
+Loads TODOIST_API_TOKEN from .env if present.
 """
 
 import sys
+from pathlib import Path
+
+# Load .env for local development
+env_path = Path(__file__).parent / ".env"
+if env_path.exists():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv(env_path)
+    except ImportError:
+        pass
 
 # Add src to path for development
 sys.path.insert(0, "src")
