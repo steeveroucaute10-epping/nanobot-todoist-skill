@@ -22,7 +22,7 @@ If you use nanobot's GitHub skill to clone repos:
 
 ```bash
 # Clone into your nanobot custom skills directory (replace YOUR_USERNAME with your GitHub username)
-git clone https://github.com/YOUR_USERNAME/nanobot-todoist-skill.git
+git clone https://github.com/steeveroucaute10-epping/nanobot-todoist-skill.git
 cd nanobot-todoist-skill
 ```
 

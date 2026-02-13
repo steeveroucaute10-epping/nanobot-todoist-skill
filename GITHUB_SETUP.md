@@ -21,11 +21,11 @@ git init
 git add .
 git commit -m "Initial commit: Todoist MCP skill for Nanobot"
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/nanobot-todoist-skill.git
+git remote add origin https://github.com/steeveroucaute10-epping/nanobot-todoist-skill.git
 git push -u origin main
 ```
 
-Replace `YOUR_USERNAME` with your GitHub username.
+Replace `YOUR_USERNAME` with your GitHub username (or use steeveroucaute10-epping).
 
 ## 3. Clone into Nanobot custom skills (on Raspberry Pi)
 
@@ -33,7 +33,7 @@ Using nanobot's GitHub skill, or manually:
 
 ```bash
 cd ~/nanobot/custom-skills  # or your nanobot skills directory
-git clone https://github.com/YOUR_USERNAME/nanobot-todoist-skill.git
+git clone https://github.com/steeveroucaute10-epping/nanobot-todoist-skill.git
 ```
 
 ## 4. Update pyproject.toml

@@ -29,8 +29,8 @@ dependencies = [
 todoist-mcp = "todoist_mcp.__main__:main"
 
 [project.urls]
-Homepage = "https://github.com/YOUR_USERNAME/nanobot-todoist-skill"
-Repository = "https://github.com/YOUR_USERNAME/nanobot-todoist-skill"
+Homepage = "https://github.com/steeveroucaute10-epping/nanobot-todoist-skill"
+Repository = "https://github.com/steeveroucaute10-epping/nanobot-todoist-skill"
 
 [tool.setuptools.packages.find]
 where = ["src"]
