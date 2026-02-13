@@ -1,0 +1,30 @@
+# Example nanobot configuration for Todoist integration
+# Copy this into your nanobot config or merge with existing agents
+
+agents:
+  main:
+    name: My Assistant
+    model: gpt-4.1
+    mcpServers:
+      - todoist
+    instructions: |
+      You are a helpful assistant. When the user asks to be reminded of something,
+      wants to add an item to their todo list, or needs to remember a task, use
+      the Todoist tools to create the task for them.
+      
+      Use create_task for full control (project, due date, priority).
+      Use create_reminder_task for quick reminders.
+      Use list_projects if the user wants to see their projects or add to a specific one.
+
+mcpServers:
+  # Option 1: Command/stdio (recommended for local/Raspberry Pi)
+  todoist:
+    command: python
+    args:
+      - /home/pi/nanobot/custom-skills/nanobot-todoist-skill/run.py
+    env:
+      TODOIST_API_TOKEN: ${TODOIST_API_TOKEN}
+
+  # Option 2: HTTP (if running todoist server as separate service)
+  # todoist:
+  #   url: http://localhost:8000/mcp
