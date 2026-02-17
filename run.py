@@ -7,22 +7,28 @@ Usage:
   python run.py --http    # HTTP transport on port 8000
 
 Loads TODOIST_API_TOKEN from .env if present.
+Works correctly when Nanobot spawns this process from any working directory.
 """
 
 import sys
 from pathlib import Path
 
-# Load .env for local development
-env_path = Path(__file__).parent / ".env"
-if env_path.exists():
+# Resolve skill directory (parent of this script) - works when Nanobot runs from any cwd
+_SKILL_DIR = Path(__file__).parent.resolve()
+
+# Load .env from skill directory for local development
+_env_path = _SKILL_DIR / ".env"
+if _env_path.exists():
     try:
         from dotenv import load_dotenv
-        load_dotenv(env_path)
+        load_dotenv(_env_path)
     except ImportError:
         pass
 
-# Add src to path for development
-sys.path.insert(0, "src")
+# Ensure src is on path (for development / non-installed runs)
+_src = _SKILL_DIR / "src"
+if _src.exists() and str(_src) not in sys.path:
+    sys.path.insert(0, str(_src))
 
 from todoist_mcp.server import mcp
 

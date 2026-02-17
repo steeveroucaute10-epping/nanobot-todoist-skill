@@ -2,6 +2,10 @@
 
 A Python MCP (Model Context Protocol) server that integrates Todoist with [Nanobot](https://nanobot.ai/). When nanobot reminds you about something, it can automatically create a Todoist task so you never forget.
 
+Includes an **Agent Skill** (`SKILL.md`) per [Nanobot skill guidance](context/SKILLGuidance.md) so the agent knows when to use Todoist tools.
+
+**Target platform:** Debian (Raspberry Pi). Nanobot runs as a systemd service.
+
 ## Features
 
 - **create_task** – Create Todoist tasks with content, due dates, priority, and project
@@ -43,17 +47,20 @@ uv pip install -r requirements.txt
 
 ### 4. Set the API token
 
+**Local development / interactive use:**
 ```bash
 export TODOIST_API_TOKEN="your-api-token-here"
 ```
+Or create a `.env` file next to `run.py` with `TODOIST_API_TOKEN=...` (loaded automatically).
 
-On Raspberry Pi, add to `~/.bashrc` or create a `.env` file (and load it before starting).
+**Nanobot running as systemd service (e.g. Raspberry Pi):**  
+Do *not* rely on `.env` or `~/.bashrc`—systemd services don't inherit the user's shell environment. Set the token in the Nanobot service environment so it's available when Nanobot spawns the MCP subprocess. See [Running as a systemd service](#running-as-a-systemd-service) below.
 
 ## Nanobot Configuration
 
 Add the Todoist MCP server to your nanobot config.
 
-### Option A: Command (stdio) – recommended for Raspberry Pi
+### Option A: Command (stdio) – recommended for Raspberry Pi / local
 
 Add to your `nanobot.yaml` or `mcp-servers.yaml`:
 
@@ -62,12 +69,41 @@ mcpServers:
   todoist:
     command: python
     args:
-      - /path/to/nanobot-todoist-skill/run.py
+      - /home/pi/nanobot/custom-skills/nanobot-todoist-skill/run.py
     env:
       TODOIST_API_TOKEN: ${TODOIST_API_TOKEN}
 ```
 
-Replace `/path/to/nanobot-todoist-skill` with the actual path (e.g. `~/nanobot/custom-skills/nanobot-todoist-skill`).
+Adjust the path if your skill is installed elsewhere.
+
+**Note:** `run.py` resolves paths from its own location, so it works correctly when Nanobot spawns it from any working directory.
+
+#### Running as a systemd service
+
+When Nanobot runs under systemd (e.g. `systemctl start nanobot`), the token must be provided via the service environment. The Nanobot config's `env: TODOIST_API_TOKEN: ${TODOIST_API_TOKEN}` passes it to the MCP subprocess—but `${TODOIST_API_TOKEN}` must exist in Nanobot's process environment first.
+
+**Option 1: Environment file (recommended)**
+
+1. Create a secrets file (e.g. `/etc/nanobot/env` or `~/.config/nanobot/env`):
+   ```
+   TODOIST_API_TOKEN=your-api-token-here
+   ```
+2. Restrict permissions: `chmod 600 /path/to/env`
+3. Add to your Nanobot systemd unit (e.g. `/etc/systemd/system/nanobot.service`):
+   ```ini
+   [Service]
+   EnvironmentFile=/etc/nanobot/env
+   ```
+4. Reload and restart: `sudo systemctl daemon-reload && sudo systemctl restart nanobot`
+
+**Option 2: Inline in the unit**
+
+```ini
+[Service]
+Environment=TODOIST_API_TOKEN=your-api-token-here
+```
+
+The `.env` file next to `run.py` is only used when the MCP process starts and can load it; when Nanobot spawns the subprocess, the `env` block in the config overrides that. For systemd, setting the variable in the Nanobot service ensures it's available for the config to pass through.
 
 ### Option B: HTTP (if running as a service)
 
@@ -83,6 +119,22 @@ Replace `/path/to/nanobot-todoist-skill` with the actual path (e.g. `~/nanobot/c
      todoist:
        url: http://localhost:8000/mcp
    ```
+
+### Option C: Todoist hosted MCP (OAuth)
+
+Todoist provides a hosted MCP at `https://ai.todoist.net/mcp` with OAuth—no API token needed. See [Todoist MCP docs](https://developer.todoist.com/api/v1/#tag/Todoist-MCP).
+
+```yaml
+mcpServers:
+  todoist:
+    command: npx
+    args:
+      - -y
+      - mcp-remote
+      - https://ai.todoist.net/mcp
+```
+
+Requires Node.js. OAuth flow runs when you first connect.
 
 ### Add to your agent
 
@@ -121,11 +173,19 @@ Once configured, you can say things like:
 
 Nanobot will use the Todoist tools to create tasks or answer questions about your task list.
 
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| `ModuleNotFoundError: No module named 'todoist_mcp'` | Ensure `run.py` is in the skill directory and `src/` exists. Path resolution uses the script location, not cwd. |
+| `TODOIST_API_TOKEN environment variable is not set` | Set the token in Nanobot's `env` block or in a `.env` file next to `run.py`. **For systemd:** use `EnvironmentFile=` or `Environment=` in the Nanobot service unit so the token is available to Nanobot. |
+| MCP server doesn't start | Run `python run.py` manually to see errors. Ensure dependencies are installed (`pip install -r requirements.txt`). |
+
 ## Testing locally
 
 ```bash
 # Set your token
-export TODOIST_API_TOKEN="your-token"   # or on Windows: $env:TODOIST_API_TOKEN = "your-token"
+export TODOIST_API_TOKEN="your-token"
 
 # Run the test script
 python test_skill.py
@@ -157,8 +217,11 @@ nanobot-todoist-skill/
 │       ├── __init__.py
 │       ├── __main__.py
 │       └── server.py      # MCP tools
-├── run.py                 # Entry point
-├── test_skill.py           # Local test script
+├── context/
+│   └── SKILLGuidance.md   # Nanobot skill creation guidance
+├── run.py                 # Entry point (stdio/HTTP)
+├── SKILL.md               # Agent Skill (when/how to use Todoist tools)
+├── test_skill.py          # Local test script
 ├── requirements.txt
 ├── pyproject.toml
 ├── .env.example

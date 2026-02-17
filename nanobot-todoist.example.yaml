@@ -21,7 +21,9 @@ agents:
       today?", "what's overdue?", or "what's due this week?".
 
 mcpServers:
-  # Option 1: Command/stdio (recommended for local/Raspberry Pi)
+  # Option 1: Command/stdio (Debian / Raspberry Pi)
+  # TODOIST_API_TOKEN: when Nanobot runs as systemd, set it via EnvironmentFile or
+  # Environment= in the service unit—Nanobot must have it in its environment to pass through.
   todoist:
     command: python
     args:
@@ -32,3 +34,12 @@ mcpServers:
   # Option 2: HTTP (if running todoist server as separate service)
   # todoist:
   #   url: http://localhost:8000/mcp
+
+  # Option 3: Todoist hosted MCP (OAuth, no API token needed)
+  # See https://developer.todoist.com/api/v1/#tag/Todoist-MCP
+  # todoist:
+  #   command: npx
+  #   args:
+  #     - -y
+  #     - mcp-remote
+  #     - https://ai.todoist.net/mcp
