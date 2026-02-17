@@ -7,6 +7,8 @@ description: Todoist task management integration. Use when the user (1) wants to
 
 Use the Todoist MCP tools when the user asks about reminders, todos, or tasks.
 
+**Configuration:** See [references/setup.md](references/setup.md).
+
 ## Tool selection
 
 | User intent | Tool |
