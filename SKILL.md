@@ -7,7 +7,7 @@ description: Todoist task management integration. Use when the user (1) wants to
 
 Use the Todoist MCP tools when the user asks about reminders, todos, or tasks.
 
-**Configuration:** See [references/setup.md](references/setup.md).
+**Backend:** Python MCP server (`run.py`). Nanobot spawns it via config. See [references/setup.md](references/setup.md) for `pip install`, `python run.py` path, and systemd env.
 
 ## Tool selection
 
