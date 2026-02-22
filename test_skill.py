@@ -9,23 +9,46 @@ import os
 import sys
 from pathlib import Path
 
+# Resolve skill directory (same as run.py) so tests work from any CWD
+_SKILL_DIR = Path(__file__).parent.resolve()
+env_path = _SKILL_DIR / ".env"
+
 # Load .env before anything else
-env_path = Path(__file__).parent / ".env"
+_dotenv_loaded = False
 if env_path.exists():
     try:
         from dotenv import load_dotenv
         load_dotenv(env_path)
+        _dotenv_loaded = True
     except ImportError:
-        pass  # dotenv optional if token set via env
+        # No python-dotenv: try reading .env manually for TODOIST_API_TOKEN
+        try:
+            for line in env_path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line.startswith("TODOIST_API_TOKEN=") and not line.startswith("#"):
+                    value = line.split("=", 1)[1].strip().strip("'\"")
+                    if value and value != "your-api-token-here":
+                        os.environ["TODOIST_API_TOKEN"] = value
+                        _dotenv_loaded = True
+                    break
+        except Exception:
+            pass
 
-sys.path.insert(0, "src")
+# Ensure src is on path (for running from any directory)
+_src = _SKILL_DIR / "src"
+if _src.exists() and str(_src) not in sys.path:
+    sys.path.insert(0, str(_src))
 
 # Check for token
 token = os.environ.get("TODOIST_API_TOKEN")
-if not token or token == "your-api-token-here":
+if not token or token.strip() == "" or token == "your-api-token-here":
     print("ERROR: Set TODOIST_API_TOKEN before running.")
-    print("  Edit .env and replace 'your-api-token-here' with your token")
-    print("  Or: $env:TODOIST_API_TOKEN = 'your-token'")
+    print("  .env path checked:", env_path)
+    print("  .env exists:", env_path.exists())
+    if env_path.exists():
+        print("  Use exactly one line in .env:  TODOIST_API_TOKEN=your-token-here")
+        print("  (no spaces around =, no quotes unless token has spaces)")
+    print("  Or set in shell: $env:TODOIST_API_TOKEN = 'your-token'  (PowerShell)")
     print("  Get token: https://app.todoist.com/prefs/integrations")
     sys.exit(1)
 
