@@ -1,11 +1,11 @@
 ---
 name: todoist
-description: Todoist task management integration. Use when the user (1) wants to be reminded of something, add an item to their todo list, or create a task; (2) asks what they have due today, what's overdue, or what's due this week; (3) wants to see their projects or add a task to a specific project. Requires the Todoist MCP server to be configured in Nanobot.
+description: Todoist task management integration. You must use this skill for any action that creates, updates, completes, deletes, or queries Todoist tasks, reminders, or projects. Never claim that a Todoist change succeeded unless you have called the appropriate Todoist MCP tool and received a response. Never invent Todoist task IDs.
 ---
 
 # Todoist Integration
 
-Use the Todoist MCP tools when the user asks about reminders, todos, or tasks.
+Use the Todoist MCP tools when the user asks about reminders, todos, or tasks. If you cannot call the tools or the call fails, clearly say so — do not claim the action was completed.
 
 **Backend:** Python MCP server (`run.py`). Nanobot spawns it via config. See [references/setup.md](references/setup.md) for `pip install`, `python run.py` path, and systemd env.
 
@@ -25,3 +25,4 @@ Use the Todoist MCP tools when the user asks about reminders, todos, or tasks.
 - **create_task**: Use `due_string` for natural dates ("today", "tomorrow", "next monday", "in 2 days"). Omit `project_id` for Inbox.
 - **create_reminder_task**: Default `when` is "today". Use for simple reminders.
 - Prefer `create_reminder_task` for quick "remind me to X" requests; use `create_task` when the user specifies project, priority, or complex due dates.
+- After successfully creating a task, confirm using only the fields returned by the tool (content, project, due date, real task ID). Do not fabricate or guess these values.
