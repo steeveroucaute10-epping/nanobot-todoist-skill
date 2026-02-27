@@ -1,0 +1,13 @@
+{
+  "tools": {
+    "mcpServers": {
+      "todoist": {
+        "command": "/home/pi/nanobot-venv/bin/python",
+        "args": ["/home/pi/.nanobot/workspace/skills/todoist/run.py"],
+        "env": {
+          "TODOIST_API_TOKEN": "${TODOIST_API_TOKEN}"
+        }
+      }
+    }
+  }
+}
