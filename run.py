@@ -12,7 +12,8 @@ Usage:
   python run.py create_task "Title" --due "tomorrow" --priority 3
   python run.py create_reminder "Title" --when "today"
 
-Loads TODOIST_API_TOKEN from .env if present.
+TODOIST_API_TOKEN: On Raspberry Pi, provided via systemd EnvironmentFile.
+For local dev/testing, loaded from .env if present (see .env.example).
 Works correctly when Nanobot spawns this process from any working directory.
 """
 
