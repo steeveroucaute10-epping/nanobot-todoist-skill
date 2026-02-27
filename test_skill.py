@@ -56,6 +56,7 @@ from todoist_mcp.server import (
     create_task,
     create_reminder_task,
     list_projects,
+    list_tasks_by_filter,
     list_tasks_overdue,
     list_tasks_this_week,
     list_tasks_today,
@@ -166,6 +167,18 @@ def test_list_tasks_this_week():
     return True
 
 
+def test_list_tasks_by_filter():
+    """Test listing tasks with a custom filter query."""
+    print("\n--- Testing list_tasks_by_filter (due: tomorrow) ---")
+    result = list_tasks_by_filter(filter_query="due: tomorrow")
+    if not result.get("success"):
+        print("FAILED:", result.get("error", result))
+        return False
+    tasks = result.get("tasks", [])
+    print("OK - Tasks due tomorrow:", len(tasks), "|", [t["content"][:30] for t in tasks[:5]])
+    return True
+
+
 def main():
     print("Testing Todoist MCP skill...")
     results = []
@@ -173,6 +186,7 @@ def main():
     results.append(("list_tasks_today", test_list_tasks_today()))
     results.append(("list_tasks_overdue", test_list_tasks_overdue()))
     results.append(("list_tasks_this_week", test_list_tasks_this_week()))
+    results.append(("list_tasks_by_filter", test_list_tasks_by_filter()))
     results.append(("create_task", test_create_task()))
     results.append(("create_task_with_params", test_create_task_with_params()))
     results.append(("create_reminder_task", test_create_reminder_task()))

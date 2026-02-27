@@ -13,10 +13,10 @@ To publish this skill and use it with nanobot:
 
 ## 2. Push this project to your new repo
 
-From your local project directory:
+From your project directory (where you have the skill code):
 
 ```bash
-cd /path/to/nanobot-todoist-skill
+cd /path/to/nanobot-todoist-skill   # or: cd path\to\nanobot-todoist-skill on Windows
 git init
 git add .
 git commit -m "Initial commit: Todoist MCP skill for Nanobot"
@@ -25,7 +25,7 @@ git remote add origin https://github.com/YOUR_USERNAME/nanobot-todoist-skill.git
 git push -u origin main
 ```
 
-Replace `YOUR_USERNAME` with your GitHub username.
+Replace `YOUR_USERNAME` with your GitHub username (and the repo URL if you created a different repo name).
 
 ## 3. Clone into nanobot workspace on Raspberry Pi
 

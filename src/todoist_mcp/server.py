@@ -165,6 +165,31 @@ def _list_tasks_with_filter(filter_query: str) -> dict:
 
 
 @mcp.tool()
+def list_tasks_by_filter(filter_query: str) -> dict:
+    """
+    List tasks matching a Todoist filter query.
+
+    Use when the user asks about tasks for a specific date, project, label, or any
+    criteria not covered by the other list tools. Supports full Todoist filter syntax.
+
+    Common filter examples:
+        "due: tomorrow"
+        "due: March 2"
+        "due: next monday"
+        "due today | overdue"
+        "assigned to: me & due before: next week"
+        "#Work & due: today"
+
+    Args:
+        filter_query: A Todoist filter string (see https://todoist.com/help/articles/introduction-to-filters-V98wIH).
+
+    Returns:
+        List of tasks with id, content, url, due date, and priority.
+    """
+    return _list_tasks_with_filter(filter_query)
+
+
+@mcp.tool()
 def list_tasks_today() -> dict:
     """
     List tasks due today.
