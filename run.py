@@ -11,6 +11,7 @@ Usage:
   python run.py list_tasks_this_week    # CLI: tasks due this week
   python run.py create_task "Title" --due "tomorrow" --priority 3
   python run.py create_reminder "Title" --when "today"
+  python run.py complete_task TASK_ID
 
 TODOIST_API_TOKEN: On Raspberry Pi, provided via systemd EnvironmentFile.
 For local dev/testing, loaded from .env if present (see .env.example).
@@ -46,7 +47,7 @@ if _src.exists() and str(_src) not in sys.path:
 
 _CLI_COMMANDS = {
     "list_projects", "list_tasks_today", "list_tasks_overdue",
-    "list_tasks_this_week", "create_task", "create_reminder",
+    "list_tasks_this_week", "create_task", "create_reminder", "complete_task",
 }
 
 
@@ -74,7 +75,7 @@ def _parse_cli_args(args: list[str]) -> tuple[str, dict]:
 def _run_cli(args: list[str]) -> None:
     """Run a tool directly and print JSON result."""
     from todoist_mcp.server import (
-        create_task, create_reminder_task, list_projects,
+        create_task, create_reminder_task, complete_task, list_projects,
         list_tasks_today, list_tasks_overdue, list_tasks_this_week,
     )
 
@@ -106,6 +107,12 @@ def _run_cli(args: list[str]) -> None:
             print(json.dumps({"success": False, "error": "content is required"}))
             sys.exit(1)
         result = create_reminder_task(content=content, when=kwargs.get("when", "today"))
+    elif command == "complete_task":
+        task_id = positional[0] if positional else kwargs.get("task_id")
+        if not task_id:
+            print(json.dumps({"success": False, "error": "task_id is required"}))
+            sys.exit(1)
+        result = complete_task(task_id=task_id)
     else:
         print(json.dumps({"success": False, "error": f"Unknown command: {command}"}))
         sys.exit(1)

@@ -15,6 +15,7 @@ Use the Todoist MCP tools when the user asks about reminders, todos, or tasks. I
 |-------------|----------|
 | Create a task with full control (project, due date, priority) | `create_task` |
 | Quick reminder ("remind me to X") | `create_reminder_task` |
+| Complete / check off / close a task | `complete_task` |
 | See projects or get project ID | `list_projects` |
 | "What do I have today?" | `list_tasks_today` |
 | "What's overdue?" / "What did I miss?" | `list_tasks_overdue` |
@@ -28,3 +29,4 @@ Use the Todoist MCP tools when the user asks about reminders, todos, or tasks. I
 - Prefer `create_reminder_task` for quick "remind me to X" requests; use `create_task` when the user specifies project, priority, or complex due dates.
 - After successfully creating a task, confirm using only the fields returned by the tool (content, project, due date, real task ID). Do not fabricate or guess these values.
 - **list_tasks_by_filter**: Prefer this over `list_tasks_this_week` when the user asks about a specific day (e.g. "tasks for Monday" → `filter_query="due: Monday"`).
+- **complete_task**: Use the task ID from a list tool or from a prior create. Do not invent task IDs.

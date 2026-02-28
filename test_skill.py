@@ -53,6 +53,7 @@ if not token or token.strip() == "" or token == "your-api-token-here":
     sys.exit(1)
 
 from todoist_mcp.server import (
+    complete_task,
     create_task,
     create_reminder_task,
     list_projects,
@@ -179,6 +180,26 @@ def test_list_tasks_by_filter():
     return True
 
 
+def test_complete_task():
+    """Test completing a task: create one, then complete it."""
+    print("\n--- Testing complete_task ---")
+    create_result = create_task(
+        content="[Test] Complete-me verification - delete me",
+        due_string="today",
+    )
+    if not create_result.get("success"):
+        print("FAILED creating task:", create_result.get("error", create_result))
+        return False
+    task_id = create_result["id"]
+    result = complete_task(task_id=task_id)
+    if result.get("success"):
+        print("OK - Completed task", task_id)
+        return True
+    else:
+        print("FAILED:", result.get("error", result))
+        return False
+
+
 def main():
     print("Testing Todoist MCP skill...")
     results = []
@@ -187,6 +208,7 @@ def main():
     results.append(("list_tasks_overdue", test_list_tasks_overdue()))
     results.append(("list_tasks_this_week", test_list_tasks_this_week()))
     results.append(("list_tasks_by_filter", test_list_tasks_by_filter()))
+    results.append(("complete_task", test_complete_task()))
     results.append(("create_task", test_create_task()))
     results.append(("create_task_with_params", test_create_task_with_params()))
     results.append(("create_reminder_task", test_create_reminder_task()))

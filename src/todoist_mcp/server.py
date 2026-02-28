@@ -228,3 +228,34 @@ def list_tasks_this_week() -> dict:
         List of tasks with id, content, url, due date, and priority.
     """
     return _list_tasks_with_filter("due before: next week")
+
+
+@mcp.tool()
+def complete_task(task_id: str) -> dict:
+    """
+    Mark a task as completed (close it).
+
+    Use when the user wants to complete, finish, check off, or close a task.
+    For recurring tasks, this schedules the next occurrence. You must use the
+    real task ID from a list tool (e.g. list_tasks_today) or from a prior
+    create_task response — never invent task IDs.
+
+    Args:
+        task_id: The ID of the task to complete (required).
+
+    Returns:
+        success and a message, or an error if the task could not be closed.
+    """
+    api = _get_api()
+    try:
+        api.complete_task(task_id=task_id)
+        return {
+            "success": True,
+            "message": f"Completed task {task_id}",
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "message": f"Failed to complete task: {e}",
+        }
